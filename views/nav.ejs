@@ -1,0 +1,203 @@
+<nav id="nav" class="navbar navbar-expand navbar-dark bg-success fixed-top"style="min-width :650px;">
+  <div class="container" style="height:60px">
+      <div class="collapse navbar-collapse" id="Navber">
+          <ul class="navbar-nav mr-auto">
+              <li>
+                  <a class="navbar-brand" href="/">
+                      <i class="fas fa-home">ホーム</i>
+                  </a>
+              </li>
+              <li class="nav-item ">
+                  <a class="nav-link" href="search" >
+                      <i class="fas fa-fire">ホット</i>
+                  </a>
+              </li>
+          </ul>
+          <!--検索-->
+          <div class="form-inline my-2 my-lg-0 mx-auto">
+              <form action="search" method="get" class="input-group">
+                  <input name="text" type="text" class="form-control" style="height:px">
+                  <button class="btn btn-default" type="submit">
+                      <i class="fas fa-search"></i>
+                  </button>
+              </form>
+          </div>
+          <!--ユーザー-->
+          <form class="form-inline my-2 ml-2 my-lg-0">
+              <div class="dropdown">
+                  <a type="btn btn-light dropdown-toggle" class="btn btn-light rounded-circle p-0" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <img class="rounded-circle " width="45" height="45" src= "" onerror="this.src = 'image/default.jpg'">
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                      <a class="dropdown-item" href="set.html">設定</a>
+                      <a id="logout" class="dropdown-item" href="/login">ログアウト</a>
+                      <a class="dropdown-item" href="#">メニュー3</a>
+                  </div>
+              </div>
+          </form>
+          <!--投稿-->
+          <button type="button" class="btn btn-dark badge-pill ml-5" name="modal" data-toggle="modal" data-target="#exampleModalCenter">
+              投稿
+          </button>
+      </div>
+  </div>
+</nav>
+<div class="modal fade" id="exampleModalCenter"data-toggle="modal" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog " role="document" style="min-height:700px;min-width:500px">
+        <div class="modal-content" style="min-height:700px;min-width:500px">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">投稿設定</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="mx-auto" for="Textarea" style="width: 300px; color: #364e96;border: solid 3px green;padding: 0.5em;border-radius: 0.5em;">
+                  投稿文
+                </p>
+                <div class="mx-auto" style="width:200px;margin-top:10px;height:100px;">
+                    <input id="post-query"type="text" class="form-control" placeholder="...">
+                </div>
+                <p class="mx-auto" for="Textarea" style="width: 300px; color: #364e96;border: solid 3px green;padding: 0.5em;border-radius: 0.5em;">
+                  投票形式
+                </p>
+                <div class="mx-auto" style="width:200px;margin-top:10px;height:100px;">
+                    <div class="form-check custom-control custom-radio d-inline-flex flex-column">
+                        <input type="radio" name="post-type" id="Radios1" value="radio" class="custom-control-input" checked>
+                        <label class="form-check-label custom-control-label" for="Radios1">ラジオ</label>
+                    </div><br>
+                    <div class="form-check custom-control custom-radio d-inline-flex flex-column">
+                        <input type="radio" name="post-type" id="Radios2" value="checkbox" class="custom-control-input">
+                        <label class="form-check-label custom-control-label" for="Radios2">チェック</label>
+                    </div><br>
+                </div>
+                <p for="Textarea" class="mx-auto" for="Textarea" style="width: 300px; color: #364e96;border:solid 3px green;padding: 0.5em;border-radius: 0.5em;">テキストエリア</p>
+                <div class="mx-auto" style="width:300px;margin-top:10px">
+                    <div class="input-group mb-3">
+                        <input name="post-answer"type="text" class="form-control" placeholder="...">
+                    </div>
+                    <div class="input-group mb-3">
+                        <input name="post-answer"type="text" class="form-control" placeholder="...">
+                    </div>
+                    <div class="form-group mx-auto" style="width: 50px;margin-top:10px">
+                        <button type="button" id="addbtn" class="btn btn-success badge-pill ">
+                          追加
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-dismiss="modal">閉じる</button>
+                    <button id="submit" type="submit" class="btn btn-success" data-dismiss="modal">決定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const box = document.getElementById("post-answerBox");
+    const sub = document.getElementById("submit");
+    const query = document.getElementById("post-query");
+    const answers = document.getElementsByName("post-answer");
+    const type = document.getElementsByName("post-type");
+    const addbtn = document.getElementById("addbtn");
+    const modal = document.getElementsByName("modal")[0];
+
+    //各EventListenerをセット
+    modal.onclick = loginCheck;
+    sub.onclick = route;
+    addbtn.onclick = addAnswer;
+    document.getElementById("logout").addEventListener("click",function(){
+      document.cookie = "_id=; max-age=0";
+      document.cookie = "sessionkey=; max-age=0";
+    },false)
+
+    /****データベースに接続し投稿処理を行う****/
+    function route(){
+      //送信オブジェクトを生成
+      let obj = function(){
+        const obj = {query: query.value};
+        const answer = [];
+        for(let i = 0; i < answers.length; i++){
+          answer[i] = answers[i].value;
+        }
+        for(let i = 0; i <type.length ;i++){
+          if(type[i].checked){
+            obj.type = type[i].value;
+          }
+        }
+        obj.answers = answer;
+        return obj;
+      }();
+
+      /**生成したオブジェクトをサーバーへ送信
+       *@method post
+       *RequestPramater
+       *@ <object> obj
+       *@ <object> user
+       *ResponsePramater
+       *@ <String> "success" or err
+      **/
+      connect("/post",obj,
+      function(res){
+        if(res == "success"){
+          //投稿成功処理
+          query.value = "";
+          for(let i = 0; i < answers.length; i++){
+            answers[i].value = "";
+          }
+          console.log(document.getElementById("result"));
+        }else{
+          //投稿失敗処理
+          window.alert("投稿処理が正常に行われませんでした。");
+        }
+      });
+    }
+
+    /**inputAnswerNodeを追加
+     *最大長:48
+     *生成するElementの構造
+     *<div id="inputAnswer" + answers.length + 1>
+     *  <input type="text" name="inputAnswer" maxlength="127">
+     *  <span id="answerLength" + answers.length + 1>文字数</span>
+     *</div>
+     *文字数カウンターも同時にセット
+     *@ <span> textNode 文字数/127
+    **/
+
+    function addAnswer(e){
+      const target = e.currentTarget.parentElement;
+
+      const div = document.createElement("div");
+      div.setAttribute("class","input-group mb-3");
+
+      const inp = document.createElement("input");
+      inp.setAttribute("name","post-answer");
+      inp.setAttribute("class","form-control");
+      inp.setAttribute("placeholder","...");
+      inp.setAttribute("aria-label","...");
+
+      const btn = document.createElement("button");
+      btn.setAttribute("type","text");
+      btn.setAttribute("class","btn btn-primary rounded-circle p-0");
+      btn.setAttribute("style","width:2.5rem;height:2.5rem;");
+      btn.addEventListener("click",delAnswer);
+      btn.innerHTML = "✕";
+
+      div.appendChild(inp);
+      div.appendChild(btn);
+
+      target.parentElement.insertBefore(div,target);
+
+    }
+
+    /****inputAnswerNodeを1つ削除****/
+    function delAnswer(e){
+      let target = e.currentTarget.parentElement
+      target.parentElement.removeChild(target);
+    }
+
+    /****login確認****/
+    function loginCheck(){
+
+    }
+</script>

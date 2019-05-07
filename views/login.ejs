@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+    <title>ホーム</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-2.2.3.min.js"></script>
+    <script src="js/lib.js" type="text/javascript"></script>
+    <style media="screen">
+        .card .card-header a[data-toggle="collapse"] {
+            display: block;
+            padding: .75rem 1.25rem;
+            margin: -.75rem -1.25rem;
+        }
+
+        .card .card-header a[data-toggle="collapse"]:active,
+        .card .card-header a[data-toggle="collapse"]:hover,
+        .card .card-header a[data-toggle="collapse"]:focus {
+            text-decoration: none; //リンクテキストの下線を消す
+        }
+        .profil{
+          width:90%;
+          font-size:small;
+          margin-top:5px
+
+        }
+    </style>
+
+</head>
+
+<body style="min-width :650px;background-color:#EEEEEE;padding-top:5.5rem;">
+    <%- include('./nav') %>
+    <div class="container-fluid">
+        <div class="row">
+
+            <!--プロフィール  align-items-start -->
+            <div class="col-3" style="margin-top:10px;max-width:200px">
+              <div style="background-color:white; text-align:center;">
+            <form action="/login" method="post" class="needs-validation" novalidate>
+                <h5>ログイン</h5>
+                <div class="form-group mt-2">
+                    <label for="File">ID</label>
+                    <input type="text" name="loginId" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="Password" class="col-form-label">パスワード</label>
+                    <input type="password" id="validationCustom02" name="loginPass" class="form-control" id="Password" required>
+                </div>
+                <div class="form-group mx-auto" style="width:100px">
+                    <button type="submit" class="btn btn-success badge-pill">ログイン</button>
+                    <a type="submit" class="btn btn-success badge-pill mt-2" href="/usercreate">新規作成</a>
+                </div>
+              </form>
+              </div>
+            </div>
+
+            <!--投稿表示-->
+            <div class="col-9 right-contents">
+                <div class="accordion" id="result" role="tablist" aria-multiselectable="true">
+                  <button type="button" class="btn btn-success" id="newResultbtn" style="display: none;width: 100%;">新しい投稿があります</button>
+                  <text type="text" class="text text-primary" id="noResulttext" style="display: none;width: 100%;">投稿がまだありません。</text>
+                  <!--
+                    /**投稿**/
+                  -->
+                </div>
+                <div  class="mx-auto" style="width:200px">
+                  <img id="loader" src="/image/Loading.gif" width="40" height="40" alt="Now Loading..."/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+      window.addEventListener("DOMContentLoaded",function(){
+        const newResultbtn = document.getElementById("newResultbtn");
+        newResultbtn.onclick = addNewResult;
+
+        //  画面読み込み時にajaxでデータ取得
+        connect("/search",key,function(res){
+          if(res.result.length > 0){
+            key.topId = res.result[0]._id;
+            updateResult(res);
+          }else {
+            document.getElementById("loader").setAttribute('style','display:none;');
+            document.getElementById("noResulttext").setAttribute("style","display: block;width: 100%;");
+          }
+        })
+
+        //オートアップデート開始
+        this.current = setInterval(function(){
+          connect.log = false;
+          key.type = "new";
+          connect("/search",key,function(response){
+            console.log(response);
+            const res = response.result;
+            if(res.length > 0){
+              for(let data of res){
+                // 更新データに重複がないかチェック
+                let check = false;
+                // 配列の最後までループ
+                for (let i = 0; i < newResultBox.length; i++) {
+                  if (data._id == newResultBox[i]._id) {
+                    // 存在したらtrueを返す
+                    check = true;
+                  }
+                }
+                // 存在しない場合配列にdataを追加
+                if(!check) {
+                  key.index += 1;
+                  newResultBox.push(data);
+                }
+              }
+              newResultbtn.innerHTML = "新しい投稿が" + newResultBox.length + "件あります";
+              newResultbtn.setAttribute("style","display: block;width: 100%;");
+            }
+          });
+          key.type = "search";
+        },3000);
+
+        // ウインドウの下まで行けばデータを自動取得
+        window.onscroll = function(){
+          var docHeight = $(document).innerHeight(), //ドキュメントの高さ
+          windowHeight = $(window).innerHeight() + 2, //ウィンドウの高さ
+          pageBottom = docHeight - windowHeight; //ドキュメントの高さ - ウィンドウの高さ
+          if(pageBottom <= $(window).scrollTop() && conFlg) {
+            //ウィンドウの一番下までスクロールした時に実行
+            conFlg = false;
+            console.log("load");
+            document.getElementById("loader").setAttribute('style','display: block;');
+            connect("/search",key,updateResult);
+          }
+        };
+      })
+    </script>
+</body>
+</html>

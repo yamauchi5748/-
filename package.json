@@ -1,0 +1,25 @@
+{
+  "name": "webserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.6.1",
+    "chart.js": "^2.7.2",
+    "cookie-parser": "^1.4.3",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "express-session": "^1.15.6",
+    "fs": "0.0.1-security",
+    "mongodb": "^3.1.0-beta4",
+    "require": "^2.4.20",
+    "serve-index": "^1.9.1",
+    "urlsafe-base64": "^1.0.0"
+  }
+}
