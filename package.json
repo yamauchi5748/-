@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "async": "^2.6.1",
+    "async": "^3.2.2",
     "chart.js": "^2.7.2",
     "cookie-parser": "^1.4.3",
     "ejs": "^2.6.1",
